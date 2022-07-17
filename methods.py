@@ -22,15 +22,18 @@ def random_color():
     return np.random.randint(low = 0, high = 255, size = 3).tolist()
 
 
-def rect_corner(box):
+# [x, y]
+def rect_corner(box): #>    left_top, right_top, right_bottom, left_bottom
     assert len(box), "box is empty"
     corners = dict()
 
-    x = np.array(sorted(box, key = lambda x:x[0])).tolist()
-    y = np.array(sorted(box, key = lambda x:x[1])).tolist()
+    corners['left_top'], corners['right_top'], corners['right_bottom'], corners['left_bottom'] = None, None, None, None
+    x = np.array(sorted(box, key = lambda k:k[0])).tolist()
+    y = np.array(sorted(box, key = lambda k:k[1])).tolist()
     for i in x[:2]:
         if i in y[:2]:
             corners['left_top'] = i
+            break # otherwise could be right_top
     for i in x[:2]:
         if i in y[2:]:
             corners['left_bottom'] = i
@@ -40,18 +43,13 @@ def rect_corner(box):
     for i in x[2:]:
         if i in y[2:]:
             corners['right_bottom'] = i
-    if "left_top" not in corners and "right_bottom" not in corners:
+
+    if corners['left_top'] is None and corners['right_bottom'] is None:
         assert x[0] in y[2:] and x[1] in y[2:], "Error! Unexpected!"
-        corners['left_top'] = x[0]
-        corners['right_bottom'] = x[-1]  
-        corners['left_bottom'] = x[1]   
-        corners['right_top'] = y[0]
-    if "left_bottom" not in corners and "right_top" not in corners:
+        corners['left_bottom'], corners['left_top'], corners['right_top'], corners['right_bottom'] = box
+    if corners['left_bottom'] is None and corners['right_top'] is None:
         assert x[0] in y[:2] and x[1] in y[:2], "Error! Unexpected!"
-        corners['left_bottom'] = x[0]
-        corners['right_top'] = x[-1]        
-        corners['left_top'] = x[1]
-        corners['right_bottom'] = y[-1]        
+        corners['left_top'], corners['right_top'], corners['right_bottom'], corners['left_bottom'] = box    
     return corners
 
 '''
